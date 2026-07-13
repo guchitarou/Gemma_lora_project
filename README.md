@@ -56,6 +56,11 @@ CUDA_VISIBLE_DEVICES=0 python train.py
 ```
 学習は約2時間程度で終了。
 
+### 学習結果
+学習結果は下記のサイトからダウンロード可能です。
+
+[HuggingFaceモデルURL](https://huggingface.co/toutouradio/gemma-goku-prj)
+
 # Gemma4 LoRA学習 前後比較
 
 Gemma4 E4B-it に LoRA でファインチューニングを行い、学習前(ベースモデル)と学習後(アダプター適用後)の出力を比較した結果をまとめる。
