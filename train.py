@@ -10,13 +10,14 @@ from utils import create_conversation
 # prepare_model_for_kbit_training → LoRA 学習用に量子化モデルを調整
 
 model_id ="./model_weights"
-
-
-dataset = load_dataset("csv", data_files="Q_0_100.csv")
+output_dir_path = "./gemma-goku-prj"
+dataset = load_dataset("csv", data_files="training_data_goku_1k.csv", encoding="cp932")
 
 dataset = dataset.map(create_conversation, remove_columns=["No","Question", "Answer"])
-
-
+# DatasetDict -> Dataset に変換(train split を取り出す)
+dataset = dataset["train"]
+# split dataset into 90% training samples and 10% test samples
+dataset = dataset.train_test_split(test_size=0.1, shuffle=False)
 
 if torch.cuda.is_bf16_supported():
     torch_dtype = torch.bfloat16
@@ -59,12 +60,12 @@ peft_config = LoraConfig(
 
 # LoRA で学習するための「SFT（Supervised Fine-Tuning）全体設定
 args = SFTConfig(
-    output_dir="gemma-goku-prj",         # directory to save and repository id
+    output_dir=output_dir_path,         # directory to save and repository id
     max_length=512,                         # max length for model and packing of the dataset
     num_train_epochs=3,                     # number of training epochs
     per_device_train_batch_size=1,          # batch size per device during training
     per_device_eval_batch_size=1,           # batch size per device during evaluation
-    optim="adamw_torch_fused",              # use fused adamw optimizer
+    optim="paged_adamw_8bit",              # adamw_torch_fusedを使っていたが、一旦paged_adamw_8bitを使用
     logging_steps=10,                       # log every 10 steps
     save_strategy="epoch",                  # save checkpoint every epoch
     eval_strategy="epoch",                  # evaluate checkpoint every epoch

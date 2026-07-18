@@ -1,5 +1,4 @@
 
-
 system_message = "You are a helpful assistant."
 
 def create_conversation(sample):
